@@ -19,8 +19,10 @@ import com.ironsource.mediationsdk.LevelPlayInitError;
 import com.ironsource.mediationsdk.IronSource;
 import com.ironsource.mediationsdk.logger.IronLog;
 import com.ironsource.mediationsdk.model.Placement;
+import com.ironsource.mediationsdk.sdk.LevelPlayRewardedVideoListener;
 
 import java.util.Arrays;
+import java.util.List;
 
 @CapacitorPlugin(name = "RewardedVideoPlugin")
 public class RewardedVideoPluginPlugin extends Plugin {
@@ -32,14 +34,58 @@ public class RewardedVideoPluginPlugin extends Plugin {
 
         Activity activity = getActivity();
 
-        IronSource.setMetaData(activity, "Facebook_IS_CacheFlag", "IMAGE"); // Meta support
-        IronSource.setMetaData("is_test_suite", "enable"); // facultatif
+        // Important : config pour Meta Audience Network + test suite (facultatif)
+        IronSource.setMetaData(activity, "Facebook_IS_CacheFlag", "IMAGE");
+        IronSource.setMetaData("is_test_suite", "enable");
 
+        // Étape 1 – Créer la liste des formats legacy
+        List<LevelPlay.AdFormat> legacyAdFormats = Arrays.asList(LevelPlay.AdFormat.REWARDED);
+
+        // Étape 2 – Définir le listener AVANT init
+        IronSource.setLevelPlayRewardedVideoListener(new LevelPlayRewardedVideoListener() {
+            @Override
+            public void onAdAvailable(Placement placement) {
+                Log.d("IronSource", "Rewarded Video disponible");
+            }
+
+            @Override
+            public void onAdUnavailable() {
+                Log.d("IronSource", "Rewarded Video non disponible");
+            }
+
+            @Override
+            public void onAdOpened() {
+                Log.d("IronSource", "Rewarded Video ouvert");
+            }
+
+            @Override
+            public void onAdClosed() {
+                Log.d("IronSource", "Rewarded Video fermé");
+            }
+
+            @Override
+            public void onAdRewarded(Placement placement) {
+                Log.d("IronSource", "Utilisateur récompensé : " + placement.getRewardName());
+            }
+
+            @Override
+            public void onAdShowFailed(com.ironsource.mediationsdk.logger.IronSourceError error) {
+                Log.e("IronSource", "Erreur lors de l'affichage : " + error.getErrorMessage());
+            }
+
+            @Override
+            public void onAdClicked(Placement placement) {
+                Log.d("IronSource", "Rewarded Video cliqué");
+            }
+        });
+
+        // Étape 3 – Construire la requête d’initialisation
         LevelPlayInitRequest initRequest = new LevelPlayInitRequest.Builder(appKey)
-                .withLegacyAdFormats(Arrays.asList(LevelPlay.AdFormat.REWARDED))
+                .withLegacyAdFormats(legacyAdFormats)
                 .withUserId(userId)
                 .build();
 
+        // Étape 4 – Appeler l’init avec callback
         LevelPlay.init(activity.getApplicationContext(), initRequest, new LevelPlayInitListener() {
             @Override
             public void onInitFailed(@NonNull LevelPlayInitError error) {
@@ -48,7 +94,9 @@ public class RewardedVideoPluginPlugin extends Plugin {
 
             @Override
             public void onInitSuccess(LevelPlayConfiguration configuration) {
-                call.resolve();
+                // ✅ Lance le test suite pour vérifier l'intégration
+                IronSource.launchTestSuite(activity.getApplicationContext());
+                call.resolve(); // SDK prêt
             }
         });
     }
