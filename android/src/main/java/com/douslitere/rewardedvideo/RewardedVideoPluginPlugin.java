@@ -57,6 +57,10 @@ public class RewardedVideoPluginPlugin extends Plugin {
             @Override
             public void onInitSuccess(LevelPlayConfiguration configuration) {
                 Log.d(TAG, "Init success");
+
+                // ✅ Lance la test suite ici (à FAIRE seulement en mode test !)
+                IronSource.Agent.launchTestSuite();
+
                 createRewardedAd();
                 call.resolve();
             }
