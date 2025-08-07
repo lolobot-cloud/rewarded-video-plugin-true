@@ -59,7 +59,7 @@ public class RewardedVideoPluginPlugin extends Plugin {
                 Log.d(TAG, "Init success");
 
                 // ✅ Lance la test suite ici (à FAIRE seulement en mode test !)
-                IronSource.Agent.launchTestSuite();
+                // IronSource.Agent.launchTestSuite();
 
                 createRewardedAd();
                 call.resolve();
