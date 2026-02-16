@@ -250,7 +250,7 @@ public class RewardedVideoPluginPlugin extends Plugin {
     public static final String APP_KEY = "227b0b39d";
 
     // MAIN placement
-    public static final String REWARDED_VIDEO_AD_UNIT_ID = "67konrqff1j08cgg";
+    public static final String REWARDED_VIDEO_AD_UNIT_ID = "011shzy61sajxi22";
 
     // placements gifts
     private static final String GIFT1_ID = "vrpt254zy1nhs6mg";
